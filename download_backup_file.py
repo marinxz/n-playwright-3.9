@@ -69,7 +69,6 @@ def download_backup_file(location, config):
     download_ok = False
     copied_file_path = None
 
-    return False, None
     # open browser
     with sync_playwright() as playwright:
 

@@ -76,7 +76,7 @@ def download_backup_file(location, config):
         context = browser.new_context()
         # Open new page
         page = context.new_page()
-
+        logger.info(f"Opening page: {url}")
         page.goto(url)
         page.locator("[placeholder=\"E-mail\"]").click()
         page.locator("[placeholder=\"E-mail\"]").fill(user)
@@ -87,17 +87,18 @@ def download_backup_file(location, config):
         page.locator("text=Sign In").first.click()
         try:
             page.wait_for_url(check_point_index)
-
+            logger.info(f"Logged in")
             #   we are logged
 
             # Click .fa >> nth=0
             page.locator(".fa").first.click()
             page.locator("span:has-text(\"Admin\")").click()
             page.wait_for_url(check_point_admin)
+            logger.info(f"On Admin page")
             # Click text=Manage Data
             page.locator("text=Manage Data").click()
             page.wait_for_url(check_point_data)
-
+            logger.info(f"Backing up database")
             # Click text=Click Here To Backup Your Database
 
             with page.expect_download(timeout=download_timeout) as download_info:
@@ -116,6 +117,7 @@ def download_backup_file(location, config):
                 logger.info(f"copied file name: {copied_file_path}")
                 download_ok = True
             page.wait_for_url(check_point_data)
+            logger.info(f"Download completed")
         except TimeoutError as tex:
             logger.error(f"Timeout while waiting for download {str(tex)}")
             download_ok = False
@@ -124,9 +126,9 @@ def download_backup_file(location, config):
             download_ok = False
 
         #   logout
-
+        logger.info(f"Logging out")
         # Click text=Test Guest Canine To Five Ferndale
-        page.locator(f"text={user_string}").click()
+        page.locator(f"has-text={user_string}").click()
         # Click text=Logout >> nth=1
         page.locator("text=Logout").nth(1).click()
 

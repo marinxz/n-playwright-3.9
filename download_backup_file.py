@@ -118,23 +118,22 @@ def download_backup_file(location, config):
                 download_ok = True
             page.wait_for_url(check_point_data)
             logger.info(f"Download completed")
+
+            logger.info(f"Logging out")
+            page.locator(f"text={user_string}").click()
+            page.locator("text=Logout").nth(1).click()
+
+
         except TimeoutError as tex:
             logger.error(f"Timeout while waiting for download {str(tex)}")
             download_ok = False
         except Exception as ex:
             logger.error(f"General error while downloading {str(ex)}")
             download_ok = False
-
-        #   logout
-        logger.info(f"Logging out")
-        # Click text=Test Guest Canine To Five Ferndale
-        page.locator(f"has-text={user_string}").click()
-        # Click text=Logout >> nth=1
-        page.locator("text=Logout").nth(1).click()
-
-        # close connection
-        context.close()
-        browser.close()
+        finally:
+            # close connection
+            context.close()
+            browser.close()
 
     return download_ok, copied_file_path
 

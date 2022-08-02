@@ -43,3 +43,12 @@ sudo dnf -y install libgbm
 for the third one 
 sudo dnf -y install alsa-lib
 
+## there are 3 control points for loading to work, they are different for Ferndale and Detroit 
+Ferndale   
+check_point_index = https://ctfferndale.gingrapp.com/dashboard/index  
+check_point_admin = https://ctfferndale.gingrapp.com/admin   
+check_point_data = https://ctfferndale.gingrapp.com/admin/manage_data  
+
+Detroit 
+
+

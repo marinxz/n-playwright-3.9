@@ -6,7 +6,7 @@ import platform
 
 from configparser import ConfigParser
 
-from playwright.sync_api import Playwright, sync_playwright
+from playwright.sync_api import sync_playwright
 from playwright.sync_api import TimeoutError
 
 logger = logging.getLogger(__name__)
@@ -53,10 +53,18 @@ def download_backup_file(location, config):
 
     file_name = config.get(location, 'file_name')
 
+    #   load checkpoints
+
+    check_point_index = config.get(location, 'check_point_index' )
+    check_point_admin = config.get(location, 'check_point_admin' )
+    check_point_data = config.get(location, 'check_point_data' )
+    user_string = config.get(location, 'user_string' )
+
     #   print parameters
     logger.info(f"{timeout}  {download_timeout} {headless}")
     logger.info (f" User: {user} {password} {url}")
     logger.info(f"File: {file_destination}  {file_name}")
+    logger.info(f"Checkpoints: {check_point_index}  {check_point_admin} {check_point_data} {user_string}")
 
     download_ok = False
     copied_file_path = None
@@ -70,7 +78,7 @@ def download_backup_file(location, config):
         # Open new page
         page = context.new_page()
 
-        page.goto("https://ctfferndale.gingrapp.com/auth/login")
+        page.goto(url)
         page.locator("[placeholder=\"E-mail\"]").click()
         page.locator("[placeholder=\"E-mail\"]").fill(user)
         page.locator("[placeholder=\"Password\"]").click()
@@ -79,17 +87,17 @@ def download_backup_file(location, config):
         # Click text=Sign In >> nth=0
         page.locator("text=Sign In").first.click()
         try:
-            page.wait_for_url("https://ctfferndale.gingrapp.com/dashboard/index")
+            page.wait_for_url(check_point_index)
 
             #   we are logged
 
             # Click .fa >> nth=0
             page.locator(".fa").first.click()
             page.locator("span:has-text(\"Admin\")").click()
-            page.wait_for_url("https://ctfferndale.gingrapp.com/admin")
+            page.wait_for_url(check_point_admin)
             # Click text=Manage Data
             page.locator("text=Manage Data").click()
-            page.wait_for_url("https://ctfferndale.gingrapp.com/admin/manage_data")
+            page.wait_for_url(check_point_data)
 
             # Click text=Click Here To Backup Your Database
 
@@ -108,7 +116,7 @@ def download_backup_file(location, config):
                 copied_file_path = shutil.copyfile(download_file_path, file_dest_path)
                 logger.info(f"copied file name: {copied_file_path}")
                 download_ok = True
-            page.wait_for_url("https://ctfferndale.gingrapp.com/admin/manage_data")
+            page.wait_for_url(check_point_data)
         except TimeoutError as tex:
             logger.error(f"Timeout while waiting for download {str(tex)}")
             download_ok = False
@@ -119,7 +127,7 @@ def download_backup_file(location, config):
         #   logout
 
         # Click text=Test Guest Canine To Five Ferndale
-        page.locator("text=Test Guest Canine To Five Ferndale").click()
+        page.locator(f"text={user_string}").click()
         # Click text=Logout >> nth=1
         page.locator("text=Logout").nth(1).click()
 
@@ -133,6 +141,11 @@ def download_backup_file(location, config):
 if __name__ == '__main__':
 
     minimal_logger_setup()
+
+    program_path = os.path.dirname(sys.argv[0])
+    program_path = os.path.abspath(program_path)
+    logger.info(f"Program is running from {program_path}")
+
     valid_locations = ['Ferndale', 'Detroit']
 
     if len(sys.argv) < 2:
@@ -144,10 +157,11 @@ if __name__ == '__main__':
         logger.error(f"Invalid location: {location}")
         exit(1)
 
-    ini_file = 'download_backup_file.ini'
+    ini_file = os.path.join(program_path, 'download_backup_file.ini' )
+    logger.info(f"INI file is: {ini_file}")
     config = get_config(ini_file)
     if config is None:
-        logger.info(f"Configuraion file not loaded")
+        logger.info(f"Configuration file not loaded")
         exit(1)
 
     logger.info(f"Starting download for location: {location}")

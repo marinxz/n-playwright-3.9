@@ -51,4 +51,10 @@ check_point_data = https://ctfferndale.gingrapp.com/admin/manage_data
 
 Detroit 
 
+## New passwords for both
+Ging
+Detroit: nvinot@gmail.com/scorecard
+Gingr Ferndale nvinot@gmail.com / scorecard
 
+Nicolas Vinot Canine To Five Ferndale
+Nicolas Vinot Canine To Five - Cass Avenue
